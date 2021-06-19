@@ -15,7 +15,9 @@ const _ = db.command
 
 // 云函数入口函数
 exports.main = async (event, context) => {
-
+  console.log('upload score event.....');
+  console.log(event);
+  
   // 以 openid-score 作为记录 id
   const docId = `${event.userInfo.openId}-score`
 
@@ -31,12 +33,13 @@ exports.main = async (event, context) => {
   if (userRecord) {
     // 更新用户分数
 
-    const maxScore = userRecord.scores.concat([event.score]).reduce((acc, cur) => cur > acc ? cur : acc)
+    const _socresSorted = userRecord.scores.concat([{score:event.score,is_succeed:event.isSucceed}]).sort((a, b) => b.score - a.score)
+    const maxScore = _socresSorted[0].score
 
     const updateResult = await db.collection('score').doc(docId).update({
       data: {
         // _.push 指往 scores 数组字段尾部添加一个记录，该操作为原子操作
-        scores: _.push(event.score),
+        scores: _.push({score:event.score,is_succeed:event.isSucceed,use_speed_times:event.useSpeedTimes}),
         max: maxScore,
       }
     })
@@ -63,7 +66,7 @@ exports.main = async (event, context) => {
         // 这里指定了 _openid，因在云函数端创建的记录不会默认插入用户 openid，如果是在小程序端创建的记录，会默认插入 _openid 字段
         _openid: event.userInfo.openId,
         // 分数历史
-        scores: [event.score],
+        scores: [{score:event.score,is_succeed:event.isSucceed,use_speed_times:event.useSpeedTimes}],
         // 缓存最大值
         max: event.score,
       }

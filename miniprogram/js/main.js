@@ -5,19 +5,27 @@ import GameInfo from './runtime/gameinfo';
 import Music from './runtime/music';
 import DataBus from './databus';
 import Steering from './player/steering';
+import Wind from './player/wind';
 import Monster from './npc/monster';
+import {flag} from './runtime/background'
 import {
   isCollideWith
 } from './utils/index';
 import {
   goldArr,
-  monsterArr
+  sumSpeedTimes,
+  monsterArr,
+  getWinPoint
 } from './const';
 import {
   wallArr,
   WALL_WIDTH,
   WALL_HEIGHT
 } from './runtime/wall';
+import {
+  FLAG_WIDTH,
+  FLAG_HEIGHT
+} from './npc/flag'
 
 let ctx = canvas.getContext('2d');
 let databus = new DataBus();
@@ -30,7 +38,7 @@ wx.cloud.init({
   //   env 参数决定接下来小程序发起的云开发调用（wx.cloud.xxx）会默认请求到哪个云环境的资源
   //   此处请填入环境 ID, 环境 ID 可打开云控制台查看
   //   如不填则使用默认环境（第一个创建的环境）
-  // env: 'my-env-id',
+  env: 'test-qu2ci',
 });
 const db = wx.cloud.database();
 
@@ -44,8 +52,12 @@ export default class Main {
     this.personalHighScore = 0;
     this.isTouchEnd = false;
     this.steeringTimer = null;
-    this.goldArr = goldArr;
+    this.goldArr = [...goldArr];
     this.initGoldLength = goldArr.length;
+    this.rand = Math.random();
+    // 显示游戏说明弹框
+    this.gameExplain = true;
+    this.speeding = false;
     this.restart();
     this.login();
   }
@@ -56,6 +68,10 @@ export default class Main {
       name: 'login',
       success: (res) => {
         window.openid = res.result.openid;
+        console.log('window.openid....');
+        console.log(res);
+        console.log(window.openid);
+        
         this.prefetchHighScore();
       },
       fail: (err) => {
@@ -66,10 +82,17 @@ export default class Main {
 
   prefetchHighScore() {
     // 预取历史最高分
+    console.log('获取最高分');
+    console.log(db.collection('score'));
+   
     db.collection('score')
       .doc(`${window.openid}-score`)
       .get()
       .then((res) => {
+        console.log('prefetchHighScore......');
+        console.log(res);
+        console.log(this.personalHighScore, this.prefetchHighScoreFailed);
+        
         if (this.personalHighScore) {
           if (res.data.max > this.personalHighScore) {
             this.personalHighScore = res.data.max;
@@ -77,6 +100,8 @@ export default class Main {
         } else {
           this.personalHighScore = res.data.max;
         }
+        console.log(1234);
+        
       })
       .catch((err) => {
         console.error('db get score catch error', err);
@@ -86,9 +111,8 @@ export default class Main {
 
   restart() {
     databus.reset();
-    this.goldArr = goldArr;
+    this.goldArr = [...goldArr];
     this.initGoldLength = goldArr.length;
-
     canvas.removeEventListener('touchstart', this.touchHandler);
 
     canvas.removeEventListener('touchstart', this.touchSteeringHandler);
@@ -100,18 +124,25 @@ export default class Main {
     this.gameinfo = new GameInfo();
     this.music = new Music();
     this.steering = new Steering();
-
+    this.wind = new Wind();
     this.bindLoop = this.loop.bind(this);
     this.hasEventBind = false;
 
     // 清除上一局的动画
     window.cancelAnimationFrame(this.aniId);
 
-    // this.steering.renderSteering(ctx)
-    this.touchSteeringHandler = this.touchSteeringEventHandler.bind(this);
-    this.touchEndSteeringHandler = this.touchEndSteeringEventHandler.bind(this);
-    canvas.addEventListener('touchstart', this.touchSteeringHandler);
-    canvas.addEventListener('touchend', this.touchEndSteeringHandler);
+    if(this.gameExplain){
+      this.touchExplainHandler = this.touchExplainEventHandler.bind(this)
+      canvas.addEventListener('touchstart', this.touchExplainHandler);
+    }else{
+      canvas.removeEventListener('touchstart',this.touchExplainHandler)
+      // this.steering.renderSteering(ctx)
+      this.touchSteeringHandler = this.touchSteeringEventHandler.bind(this);
+      this.touchEndSteeringHandler = this.touchEndSteeringEventHandler.bind(this);
+      canvas.addEventListener('touchstart', this.touchSteeringHandler);
+      canvas.addEventListener('touchend', this.touchEndSteeringHandler);
+
+    }
 
     this.aniId = window.requestAnimationFrame(this.bindLoop, canvas);
   }
@@ -155,44 +186,70 @@ export default class Main {
     for (let i = 0, il = databus.monsters.length; i < il; i++) {
       let monster = databus.monsters[i];
       // 检查monster碰到墙的情况
-      that.bg.wallPositions.forEach(item=>{
-        if(isCollideWith({x:item[0],y:item[1],width:WALL_WIDTH,height:WALL_HEIGHT},monster)){
+      that.bg.wallPositions.forEach(item => {
+        if (isCollideWith({
+            x: item[0],
+            y: item[1],
+            width: WALL_WIDTH,
+            height: WALL_HEIGHT
+          }, monster)) {
           monster.setDeactive()
         }
       })
       if (isCollideWith(this.player, monster)) {
         monster.playAnimation()
         that.music.playExplosion()
-        this.player.visible=false
         databus.gameOver = true;
-        // 获取历史高分
-        if (this.personalHighScore) {
-          if (databus.score > this.personalHighScore) {
-            this.personalHighScore = databus.score;
-          }
-        }
-
-        // 上传结果
-        // 调用 uploadScore 云函数
-        wx.cloud.callFunction({
-          name: 'uploadScore',
-          // data 字段的值为传入云函数的第一个参数 event
-          data: {
-            score: databus.score,
-          },
-          success: (res) => {
-            if (this.prefetchHighScoreFailed) {
-              this.prefetchHighScore();
-            }
-          },
-          fail: (err) => {
-            console.error('upload score failed', err);
-          },
-        });
-
+        this.gameFinish()
         break;
       }
     }
+
+    // const flagPoint = getWinPoint(this.rand)
+    // console.log('hhhhhhh');
+    // console.log(this.flag,this.player);
+    
+    if (isCollideWith(flag, this.player)) {
+      console.log('win.....');
+      databus.score += 2
+      databus.gameWin = true
+      this.gameFinish(true)
+    }
+  }
+
+  gameFinish(succeed=false) {
+    this.player.visible = false
+    this.speeding = false
+    this.music.stopSpeed()
+    // databus.gameOver = true;
+    // 获取历史高分
+    if (this.personalHighScore) {
+      if (databus.score > this.personalHighScore) {
+        this.personalHighScore = databus.score;
+      }
+    }
+    // 上传结果
+    // 调用 uploadScore 云函数
+    wx.cloud.callFunction({
+      name: 'uploadScore',
+      // data 字段的值为传入云函数的第一个参数 event
+      data: {
+        score: databus.score,
+        isSucceed: succeed,
+        useSpeedTimes: databus.realSpeedTimes,
+      },
+      success: (res) => {
+        console.log('upload score res.....');
+        console.log(res);
+        this.prefetchHighScore();
+        
+        if (this.prefetchHighScoreFailed) {
+        }
+      },
+      fail: (err) => {
+        console.error('upload score failed', err);
+      },
+    });
   }
 
   // 游戏结束后的触摸事件处理逻辑
@@ -212,6 +269,26 @@ export default class Main {
     )
       this.restart();
   }
+
+  // 游戏说明弹窗的触摸事件处理逻辑
+  touchExplainEventHandler(e) {
+    e.preventDefault();
+
+    let x = e.touches[0].clientX;
+    let y = e.touches[0].clientY;
+
+    let area = this.gameinfo.startBtnArea;
+
+    if (
+      x >= area.startX &&
+      x <= area.endX &&
+      y >= area.startY &&
+      y <= area.endY
+    ){
+      this.gameExplain=false;
+      this.restart();
+    }
+  }
   // 方向盘 和加速器 事件处理
   touchSteeringEventHandler(e) {
     e.preventDefault();
@@ -225,7 +302,7 @@ export default class Main {
     let areaLeft = this.steering.leftBtnArea;
     let areaRight = this.steering.rightBtnArea;
     let areaSpeed = this.steering.speedBtnArea;
-
+    
     if (
       x >= areaUp.startX &&
       x <= areaUp.endX &&
@@ -233,7 +310,7 @@ export default class Main {
       y <= areaUp.endY
     ) {
       this.steeringTimer = setInterval(() => {
-        if (databus.gameOver) {
+        if (databus.gameOver||databus.gameWin) {
           clearInterval(this.steeringTimer);
         } else {
           this.player.setPositionUp(this);
@@ -246,7 +323,7 @@ export default class Main {
       y <= areaDown.endY
     ) {
       this.steeringTimer = setInterval(() => {
-        if (databus.gameOver) {
+        if (databus.gameOver||databus.gameWin) {
           clearInterval(this.steeringTimer);
 
         } else {
@@ -261,7 +338,7 @@ export default class Main {
       y <= areaLeft.endY
     ) {
       this.steeringTimer = setInterval(() => {
-        if (databus.gameOver) {
+        if (databus.gameOver||databus.gameWin) {
           clearInterval(this.steeringTimer);
 
         } else {
@@ -276,7 +353,7 @@ export default class Main {
       y <= areaRight.endY
     ) {
       this.steeringTimer = setInterval(() => {
-        if (databus.gameOver) {
+        if (databus.gameOver||databus.gameWin) {
           clearInterval(this.steeringTimer);
 
         } else {
@@ -290,7 +367,10 @@ export default class Main {
       y >= areaSpeed.startY &&
       y <= areaSpeed.endY
     ) {
-      this.player.setSpeed();
+      this.player.setSpeed(undefined,this);
+      if(databus.speedTimes< sumSpeedTimes){
+        this.music.playSpeed();
+      }
     }
   }
   //
@@ -311,9 +391,13 @@ export default class Main {
       3 * canvas.height
     );
 
-    this.bg.render(ctx, this.goldArr, databus.monsterArr);
+    this.bg.render(ctx, this.goldArr, databus.monsterArr, this.rand);
 
-    this.steering.renderSteering(ctx);
+    this.steering.renderSteering(ctx,this);
+    
+    if(this.speeding){
+      this.wind.drawToCanvas(ctx)
+    }
 
     databus.monsters.forEach((item) => {
       item.drawToCanvas(ctx);
@@ -329,11 +413,21 @@ export default class Main {
 
     this.gameinfo.renderGameScore(ctx, databus.score);
 
-    // 游戏结束停止帧循环
-    if (databus.gameOver) {
+    if(this.gameExplain){
       canvas.removeEventListener('touchstart', this.touchSteeringHandler);
       canvas.removeEventListener('touchend', this.touchEndSteeringHandler);
-      this.gameinfo.renderGameOver(ctx, databus.score, this.personalHighScore);
+      
+      this.gameinfo.renderGameExplain(ctx);
+
+      return;
+    }
+
+    // 游戏结束停止帧循环
+    // console.log(databus.gameOver,databus.gameWin)
+    if (databus.gameOver || databus.gameWin) {
+      canvas.removeEventListener('touchstart', this.touchSteeringHandler);
+      canvas.removeEventListener('touchend', this.touchEndSteeringHandler);
+      this.gameinfo.renderGameOver(ctx, databus.score, this.personalHighScore,databus.gameWin);
 
       if (!this.hasEventBind) {
         this.hasEventBind = true;
@@ -345,7 +439,7 @@ export default class Main {
 
   // 游戏逻辑更新主函数
   update() {
-    if (databus.gameOver) return;
+    if (databus.gameOver||databus.gameWin) return;
     this.generateMonster();
     this.scoreDetection();
     this.collisionDetection();

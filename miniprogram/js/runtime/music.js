@@ -10,21 +10,38 @@ export default class Music {
 
     instance = this
 
-    // this.bgmAudio = new Audio()
-    // this.bgmAudio.loop = true
-    // this.bgmAudio.src  = 'audio/bgm.mp3'
+    //背景音乐
+    this.bgmAudio = new Audio()
+    this.bgmAudio.loop = true
+    this.bgmAudio.src  = 'audio/bgm.mp3'
 
+    //加速音效
+    this.speedAudio     = new Audio()
+    this.speedAudio.loop = true
+    this.speedAudio.src = 'audio/bullet.mp3'
+
+    //捡到金币音效
     this.shootAudio     = new Audio()
     this.shootAudio.src = 'audio/bullet.mp3'
 
+    //碰到怪兽虫子音效
     this.boomAudio     = new Audio()
     this.boomAudio.src = 'audio/boom.mp3'
 
-    // this.playBgm()
+    this.playBgm()
   }
 
   playBgm() {
     this.bgmAudio.play()
+  }
+
+  playSpeed() {
+    this.speedAudio.currentTime = 0
+    this.speedAudio.play()
+  }
+  
+  stopSpeed(){
+    this.speedAudio.pause()
   }
 
   playShoot() {

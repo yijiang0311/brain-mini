@@ -3,9 +3,11 @@ import Wall from './wall'
 import Gold from '../npc/gold'
 import Monster from '../npc/monster'
 import DataBus from '../databus'
+import Flag from '../npc/flag'
 import {
-  wallArr
+  geneWallData
 } from './wall'
+import {getWinPoint} from '../const'
 const screenWidth = window.innerWidth
 const screenHeight = window.innerHeight
 
@@ -16,6 +18,8 @@ const WALL_IMG_SRC = 'images/wall.png'
 const WALL_WIDTH = 50
 const WALL_HEIGHT = 50
 
+
+
 const wallImg = new Image()
 wallImg.src = WALL_IMG_SRC
 
@@ -23,6 +27,7 @@ const databus = new DataBus()
 const wall = new Wall()
 const gold = new Gold()
 const monster = new Monster()
+export const flag = new Flag()
 /**
  * 游戏背景类
  * 提供update和render函数实现无限滚动的背景功能
@@ -33,12 +38,13 @@ export default class BackGround extends Sprite {
 
     this.top = 0
     this.left = 0
-    this.wallArr = wallArr
+    this.wallArr = geneWallData()
     this.wallPositions = []
     this.goldPositions = []
 
     // this.render(ctx,[])
   }
+
 
   update() {
 
@@ -88,7 +94,7 @@ export default class BackGround extends Sprite {
    * 第一张漏出高度为top部分，其余的隐藏在屏幕上面
    * 第二张补全除了top高度之外的部分，其余的隐藏在屏幕下面
    */
-  render(ctx,goldArr=[],monsterArr=[]) {
+  render(ctx,goldArr=[],monsterArr=[],rand) {
 
     ctx.drawImage(
       this.img,
@@ -101,6 +107,16 @@ export default class BackGround extends Sprite {
       screenWidth * 3,
       screenHeight * 3
     )
+
+    //渲染旗帜
+    const flagPoint = getWinPoint(rand)
+    // console.log('flagPoint......');
+    // console.log(flagPoint);
+    // console.log(-screenWidth);
+    // console.log(-screenWidth+this.left+flagPoint[0]);
+    // console.log(flagPoint[0]);
+    
+    flag.render(ctx,-screenWidth+this.left+flagPoint[0],-screenHeight+this.top+flagPoint[1])
 
     this.goldPositions = []
     goldArr.forEach((item) => {

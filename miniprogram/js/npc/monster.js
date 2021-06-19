@@ -2,7 +2,7 @@ import Animation from '../base/animation';
 import DataBus from '../databus';
 import { startPoint } from '../const';
 
-const MONSTER_IMG_SRC = 'images/enemy.png';
+const MONSTER_IMG_LIST = ['images/monster/monster0.png','images/monster/monster1.png','images/monster/monster0.png',,'images/monster/monster1.png'];
 const MONSTER_WIDTH = 50;
 const MONSTER_HEIGHT = 50;
 
@@ -21,13 +21,13 @@ function rnd(start, end) {
 
 export default class Enemy extends Animation {
   constructor() {
-    super(MONSTER_IMG_SRC, MONSTER_WIDTH, MONSTER_HEIGHT);
+    super(MONSTER_IMG_LIST, MONSTER_WIDTH, MONSTER_HEIGHT);
     this.x = 0;
     this.y = 0;
     this.offsetX = 0;
     this.offsetY = 0;
     this.active = false;
-    this.speed = 1;
+    this.speed = 0.8;
     this.speedX = 0;
     this.speedY = 0;
     this.initExplosionAnimation()
@@ -37,7 +37,7 @@ export default class Enemy extends Animation {
     this.offsetY = startPoint[1] + y;
     this.x = this.offsetX;
     this.y = this.offsetY;
-    console.log(this.x,this.y);
+    // console.log(this.x,this.y);
     
     this.visible = true;
   }

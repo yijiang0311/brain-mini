@@ -27,11 +27,15 @@ export default class DataBus {
     this.animations = []
     this.walls = []
     this.gameOver   = false
+    this.gameWin   = false
     this.monsterArr = monsterArr
     this.monsters = []
     this.bg = null
     // this.goldArr = goldArr
-
+    //使用加速按钮的次数
+    this.speedTimes = 0
+     //使用加速按钮的次数,不延时 用来上传数据
+    this.realSpeedTimes = 0
   }
 
   /**

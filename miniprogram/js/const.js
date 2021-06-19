@@ -1,39 +1,39 @@
+const screenWidth = window.innerWidth
+const screenHeight = window.innerHeight
+
+
+//最多使用加速次数
+export const sumSpeedTimes = 3;
+
 export const startPoint = [-window.innerWidth,-window.innerHeight]
 export const goldArr = [
-  [100,100],
-  [200,200],
-  [300,300],
-  [300,400],
-  [400,500],
-  [500,600],
-  [600,700],
-  [700,800],
-  [800,1000],
-  [600,1700],
-  [600,2700],
+  [100,0.5*screenHeight],
+  [1.2*screenWidth,0.4*screenHeight],
+  [2*screenWidth,0.4*screenHeight],
+  [0.9*screenWidth,1.4*screenHeight],
+  [2.5*screenWidth,screenHeight],
+  [2.8*screenWidth,1.5*screenHeight],
+  [0.8*screenWidth,1.7*screenHeight],
+  [0.8*screenWidth,2.3*screenHeight],
+  [2.5*screenWidth,2.3*screenHeight],
+  [1.5*screenWidth,2.8*screenHeight],
 ]
 
 export const monsterArr = [
-  // [100,200],
-  // [200,100],
-  // [200,200],
-  // [300,300],
-  // [300,500],
-  // [400,400],
+  [120,0.5*screenHeight+100],
+  [1*screenWidth,0.5*screenHeight],
+  [2.2*screenWidth,0.5*screenHeight],
+  [0.7*screenWidth,1.2*screenHeight],
+  [2.3*screenWidth,1.1*screenHeight],
 
-  [400,600],
-  // [500,500],
-
-  // [500,700],
-  // [600,600],
-  // [600,800],
-  // [700,600],
-  // [700,900],
-  // [800,800],
-  // [800,1100],
-  // [900,1000],
-  // [600,1800],
-  // [700,1700],
-  // [600,2800],
-  // [700,2700],
+  // [2.8*screenWidth,1.5*screenHeight],
+  // [0.8*screenWidth,1.7*screenHeight],
+  [0.7*screenWidth,2.1*screenHeight],
+  [2.3*screenWidth,2.1*screenHeight],
+  [1.2*screenWidth,2.5*screenHeight],
 ]
+
+export const getWinPoint = (rand)=>{
+  // return rand<0.5 ? [0.3*screenWidth,0.5*screenHeight] : [250,2.7*screenHeight]
+  return [0.8*screenWidth,0.4*screenHeight]
+}

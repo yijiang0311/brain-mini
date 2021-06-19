@@ -4,6 +4,7 @@ import DataBus from '../databus';
 import Wall, { WALL_WIDTH, WALL_HEIGHT } from '../runtime/wall';
 import { isCollideWith } from '../utils/index';
 import { GOLD_WIDTH, GOLD_HEIGHT } from '../npc/gold';
+import {sumSpeedTimes} from '../const'
 
 const screenWidth = window.innerWidth;
 const screenHeight = window.innerHeight;
@@ -11,14 +12,21 @@ const MIN_DISTANCE = 200;
 
 // 玩家相关常量设置
 const PLAYER_IMG_SRC = 'images/hero.png';
+const IMG_LIST = ['images/hero/hero0.png','images/hero/hero1.png','images/hero/hero2.png','images/hero/hero3.png','images/hero/hero4.png','images/hero/hero3.png','images/hero/hero2.png','images/hero/hero1.png']
 const PLAYER_WIDTH = 50;
 const PLAYER_HEIGHT = 50;
+const SPEED = 10;
+const BIG_SPEED = 18;
+const SPEED_TIME = 5000;
+
+// //最多使用加速次数
+// const TIMES = 3;
 
 let databus = new DataBus();
 
 export default class Player extends Sprite {
   constructor() {
-    super(PLAYER_IMG_SRC, PLAYER_WIDTH, PLAYER_HEIGHT);
+    super(IMG_LIST, PLAYER_WIDTH, PLAYER_HEIGHT);
 
     // 玩家默认处于屏幕底部居中位置
     this.x = screenWidth / 2 - this.width / 2;
@@ -28,11 +36,15 @@ export default class Player extends Sprite {
     this.touched = false;
 
     this.bullets = [];
-    this.speed = 10;
+    this.speed = SPEED;
+
+    // this.times = 0;
 
     // 初始化事件监听
     // this.initEvent()
   }
+
+
 
   /**
    * 当手指触摸屏幕的时候
@@ -72,14 +84,19 @@ export default class Player extends Sprite {
     this.y = disY;
   }
 
-  setSpeed(speed = 15) {
-    if (this.speed === speed) {
+  setSpeed(speed = BIG_SPEED,app) {
+    if (this.speed === speed|| databus.speedTimes>=sumSpeedTimes) {
       return;
     }
+    databus.realSpeedTimes++;
     this.speed = speed;
+    app.speeding = true
     setTimeout(() => {
-      this.speed = 10;
-    }, 5000);
+      databus.speedTimes++;
+      this.speed = SPEED;
+      app.speeding = false;
+      app.music.stopSpeed();
+    }, SPEED_TIME);
   }
   setPosition(x, y) {
     let disX = x;

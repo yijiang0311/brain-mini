@@ -3,8 +3,20 @@
  */
 export default class Sprite {
   constructor(imgSrc = '', width = 0, height = 0, x = 0, y = 0) {
-    this.img = new Image()
-    this.img.src = imgSrc
+
+    if (imgSrc &&  imgSrc instanceof Array) {
+      this.dynamic = true
+      this.dynamicImgList = []
+      this.initImgs(imgSrc)
+
+      this.dynamicIndex = 0
+      this.dynamicCount = 0
+    } else {
+      this.dynamic = false
+      this.img = new Image()
+      this.img.src = imgSrc
+
+    }
 
     this.width = width
     this.height = height
@@ -15,20 +27,50 @@ export default class Sprite {
     this.visible = true
   }
 
+  initImgs(dynamicImgList) {
+    dynamicImgList.forEach((imgSrc) => {
+      let img = new Image()
+      img.src = imgSrc
+
+      this.dynamicImgList.push(img)
+    })
+  }
   /**
    * 将精灵图绘制在canvas上
    */
-  drawToCanvas(ctx) {
+  drawToCanvas(ctx,speed=0.1) {
     if (!this.visible)
       return
 
-    ctx.drawImage(
-      this.img,
-      this.x,
-      this.y,
-      this.width,
-      this.height
-    )
+    if (this.dynamic) {
+      //切换的速度
+      // const speed = 0.1;
+      this.dynamicCount = this.dynamicCount + speed;
+      //0,1,2
+      if (this.dynamicIndex >= this.dynamicImgList.length - 1) {
+        this.dynamicCount = 0;
+      }
+      //减速器的作用
+      this.dynamicIndex = Math.floor(this.dynamicCount);
+
+      ctx.drawImage(
+        this.dynamicImgList[this.dynamicIndex],
+        this.x,
+        this.y,
+        this.width,
+        this.height
+      )
+    } else {
+      
+      ctx.drawImage(
+        this.img,
+        this.x,
+        this.y,
+        this.width,
+        this.height
+      )
+    }
+
   }
 
   /**
