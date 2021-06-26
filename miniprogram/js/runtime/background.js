@@ -11,9 +11,9 @@ import {getWinPoint} from '../const'
 const screenWidth = window.innerWidth
 const screenHeight = window.innerHeight
 
-const BG_IMG_SRC = 'images/bg.jpg'
-const BG_WIDTH = 512
-const BG_HEIGHT = 512
+const BG_IMG_SRC = 'images/bg.png'
+const BG_WIDTH = 414
+const BG_HEIGHT = 616
 const WALL_IMG_SRC = 'images/wall.png'
 const WALL_WIDTH = 50
 const WALL_HEIGHT = 50

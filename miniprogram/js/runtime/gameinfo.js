@@ -37,32 +37,32 @@ export default class GameInfo {
       screenHeight / 2 - 200 + 130
     )
     ctx.fillText(
-      '胜利，期间收集金币越多得分越高。' ,
+      '胜利，期间收集苹果🍎越多得分越高。' ,
       screenWidth / 2 - 130,
       screenHeight / 2 - 200 + 130 + 24
     )
     ctx.fillText(
-      '左下角方向盘控制人物移动。' ,
+      '左下角【方向盘】控制人物移动。' ,
       screenWidth / 2 - 130,
       screenHeight / 2 - 200 + 130 + 68
     )
     ctx.fillText(
-      '右下角圆形按钮为加速按钮：点击之' ,
+      '右下角【人型按钮】为加速按钮：点' ,
       screenWidth / 2 - 130,
       screenHeight / 2 - 200 + 130 + 68+24
     )
     ctx.fillText(
-      '后人物的速度将会提升；最多有3次' ,
+      '击之后人物的速度将会提升；最多有' ,
       screenWidth / 2 - 130,
       screenHeight / 2 - 200 + 130 + 68+24*2
     )
     ctx.fillText(
-      '点击加速的机会；每次加速的持续时' ,
+      '【3次】点击加速的机会；每次加速的' ,
       screenWidth / 2 - 130,
       screenHeight / 2 - 200 + 130 + 68+24*3
     )
     ctx.fillText(
-      '间为5秒钟。' ,
+      '持续时间为【5秒钟】。' ,
       screenWidth / 2 - 130,
       screenHeight / 2 - 200 + 130 + 68+24*4
     )

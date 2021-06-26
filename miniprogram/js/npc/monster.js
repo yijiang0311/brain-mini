@@ -2,7 +2,7 @@ import Animation from '../base/animation';
 import DataBus from '../databus';
 import { startPoint } from '../const';
 
-const MONSTER_IMG_LIST = ['images/monster/monster0.png','images/monster/monster1.png','images/monster/monster0.png',,'images/monster/monster1.png'];
+const MONSTER_IMG_LIST = ['images/monster/monster0.png','images/monster/monster1.png','images/monster/monster2.png','images/monster/monster3.png','images/monster/monster4.png'];
 const MONSTER_WIDTH = 50;
 const MONSTER_HEIGHT = 50;
 
@@ -45,7 +45,7 @@ export default class Enemy extends Animation {
   initExplosionAnimation() {
     let frames = []
 
-    const EXPLO_IMG_PREFIX  = 'images/explosion'
+    const EXPLO_IMG_PREFIX  = 'images/explosion/explosion'
     const EXPLO_FRAME_COUNT = 19
 
     for ( let i = 0;i < EXPLO_FRAME_COUNT;i++ ) {

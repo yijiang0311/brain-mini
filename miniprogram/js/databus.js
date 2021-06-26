@@ -32,6 +32,7 @@ export default class DataBus {
     this.monsters = []
     this.bg = null
     // this.goldArr = goldArr
+    this.speeding = false
     //使用加速按钮的次数
     this.speedTimes = 0
      //使用加速按钮的次数,不延时 用来上传数据

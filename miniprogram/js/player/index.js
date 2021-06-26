@@ -90,11 +90,13 @@ export default class Player extends Sprite {
     }
     databus.realSpeedTimes++;
     this.speed = speed;
-    app.speeding = true
+    app.speeding = true;
+    databus.speeding = true;
     setTimeout(() => {
       databus.speedTimes++;
       this.speed = SPEED;
       app.speeding = false;
+      databus.speeding = false;
       app.music.stopSpeed();
     }, SPEED_TIME);
   }

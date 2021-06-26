@@ -1,10 +1,12 @@
 import DataBus from '../databus';
-import {sumSpeedTimes} from '../const'
-const screenWidth  = window.innerWidth
+import {
+  sumSpeedTimes
+} from '../const'
+const screenWidth = window.innerWidth
 const screenHeight = window.innerHeight
 
 let steering = new Image()
-steering.src = 'images/steering.jpeg'
+steering.src = 'images/steering.png'
 let speed = new Image()
 speed.src = 'images/speed.png'
 let speedDisabled = new Image()
@@ -13,40 +15,40 @@ let databus = new DataBus();
 
 export default class Steering {
   renderSteering(ctx) {
-  const speedImg = databus.speedTimes >= sumSpeedTimes ? speedDisabled : speed
-   ctx.drawImage(steering,0,screenHeight-200,200,200)
-   ctx.drawImage(speedImg,screenWidth-100,screenHeight-100,100,100)
+    const speedImg = databus.speedTimes >= sumSpeedTimes || databus.speeding ? speedDisabled : speed
+    ctx.drawImage(steering, 0, screenHeight - 220, 220, 220)
+    ctx.drawImage(speedImg, screenWidth - 125, screenHeight - 125, 125, 125)
 
-   this.upBtnArea = {
-      startX: 66,
-      startY: screenHeight -170,
-      endX  : 66  + 66,
-      endY  : screenHeight -170 + 66
+    this.upBtnArea = {
+      startX: 80,
+      startY: screenHeight - 220,
+      endX: 80 + 70,
+      endY: screenHeight - 220 + 80
     }
-   this.downBtnArea = {
-      startX: 66,
-      startY: screenHeight -170+70,
-      endX  : 66  + 66,
-      endY  : screenHeight -170+70 + 66
+    this.downBtnArea = {
+      startX: 80,
+      startY: screenHeight - 140 + 70,
+      endX: 80 + 70,
+      endY: screenHeight,
     }
-   this.leftBtnArea = {
+    this.leftBtnArea = {
       startX: 0,
-      startY: screenHeight -170+70,
-      endX  : 66,
-      endY  : screenHeight -170+70 + 66
+      startY: screenHeight - 140,
+      endX: 80,
+      endY: screenHeight - 140 + 70
+
     }
-   this.rightBtnArea = {
-      startX: 66+66,
-      startY: screenHeight -170+70,
-      endX  : 66  + 66 +66,
-      endY  : screenHeight -170+70 + 66
+    this.rightBtnArea = {
+      startX: 80 + 70,
+      startY: screenHeight - 220 + 80,
+      endX: 220,
+      endY: screenHeight - 70,
     }
-   this.speedBtnArea = {
-      startX: screenWidth-100,
-      startY: screenHeight -100,
-      endX  : screenWidth,
-      endY  : screenHeight
+    this.speedBtnArea = {
+      startX: screenWidth - 125,
+      startY: screenHeight - 125,
+      endX: screenWidth,
+      endY: screenHeight
     }
   }
 }
-

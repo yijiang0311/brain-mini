@@ -5,7 +5,7 @@ import GameInfo from './runtime/gameinfo';
 import Music from './runtime/music';
 import DataBus from './databus';
 import Steering from './player/steering';
-import Wind from './player/wind';
+// import Wind from './player/wind';
 import Monster from './npc/monster';
 import {flag} from './runtime/background'
 import {
@@ -124,7 +124,7 @@ export default class Main {
     this.gameinfo = new GameInfo();
     this.music = new Music();
     this.steering = new Steering();
-    this.wind = new Wind();
+    // this.wind = new Wind();
     this.bindLoop = this.loop.bind(this);
     this.hasEventBind = false;
 
@@ -395,9 +395,10 @@ export default class Main {
 
     this.steering.renderSteering(ctx,this);
     
-    if(this.speeding){
-      this.wind.drawToCanvas(ctx)
-    }
+    // 不要【风】了
+    // if(this.speeding){
+    //   this.wind.drawToCanvas(ctx)
+    // }
 
     databus.monsters.forEach((item) => {
       item.drawToCanvas(ctx);
